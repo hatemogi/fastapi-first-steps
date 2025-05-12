@@ -12,13 +12,13 @@ class ItemColor(str, Enum):
 class ItemBase(BaseModel):
     name: str = Field(description="아이템명")
     color: ItemColor = Field(ItemColor.RED, description="색상")
-    price: int = Field(10000, description="가격")
+    price: int = Field(default = 10000, description="가격")
 
 class Item(ItemBase):
     id: int = Field(description="아이템ID")
 
 temp_items = {
-    1: Item(id = 1, name = "아이템A", color = ItemColor.RED, price = 20000)
+    1: Item(id = 1, name = "아이템A", color = ItemColor.RED)
 }
 
 @app.get("/")
