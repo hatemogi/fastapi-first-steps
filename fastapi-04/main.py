@@ -1,38 +1,39 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from enum import Enum
+from typing import Optional
 
 app = FastAPI()
 
+@app.get("/") # GET /
+def root():
+    return {"message": "Hello World"}
+
 class ItemColor(str, Enum):
-    RED = "빨강"
-    GREEN = "초록"
-    BLUE= "파랑"
+    red = "red"
+    green = "green"
+    blue = "blue"
 
-class ItemBase(BaseModel):
-    name: str = Field(description="아이템명")
-    color: ItemColor = Field(default=ItemColor.RED, description="색상")
-    price: int = Field(default=10000, description="가격")
-
-class Item(ItemBase):
-    id: int = Field(description="아이템ID")
+class Item(BaseModel):
+    id: int
+    name: str = Field(description="상품명")
+    color: Optional[ItemColor] = Field(default=None, description="상품 색상")
 
 temp_items = {
-    1: Item(id=1, name="아이템A"),
-    2: Item(id=2, name="아이템B", color=ItemColor.BLUE)
+    1: Item(id=1, name="아이템A", color=ItemColor.red),
+    2: Item(id=2, name="아이템B", color=ItemColor.green),
 }
 
-@app.get("/")
-def root():
-    return {"message": "Hello, World"}
-
-@app.get("/items/{item_id}")
-def get_item(item_id: int) -> Item:
+@app.get("/items/{item_id}") # GET /items/{item_id}
+def read_item(item_id: int) -> Item:
     if item_id in temp_items:
         return temp_items[item_id]
     else:
-        raise HTTPException(404, "Item not found")
+        raise HTTPException(status_code=404, detail="아이템이 없어요")
 
-@app.post("/items", status_code=201)
-def create_item(item: ItemBase):
-    return {"created": True}
+@app.post("/items", status_code=201, summary="2.1 상품등록 0516") # POST /items
+def create_item(item: Item):
+    if item.id in temp_items:
+        raise HTTPException(status_code=400, detail="아이템이 이미 있어요")
+    temp_items[item.id] = item
+    return item
