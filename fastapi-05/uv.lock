@@ -101,7 +101,7 @@ standard = [
 ]
 
 [[package]]
-name = "fastapi-02"
+name = "fastapi-05"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
